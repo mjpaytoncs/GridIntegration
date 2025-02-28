@@ -1,7 +1,7 @@
 # GridIntegration
 
 ## Overview
-This repository contains a replication of **Brockmole et al. (2002)**, adapted to study **aphantasia**. The experiment is a visual working memory task where participants view two sequentially presented 4x4 grids with some filled squares. Their task is to identify the **one square** that was missing in **both** presentations.
+This repository contains a replication of **Brockmole et al. (2002)**, adapted to study **aphantasia**. The experiment is a visual working memory task where participants view two sequentially presented 4x4 grids with some filled squares. Their task is to identify the **one square** missing in **both** presentations.
 
 This version has been implemented using **jsPsych** for **online data collection**.
 
@@ -11,8 +11,8 @@ This version has been implemented using **jsPsych** for **online data collection
 - **Sequential Grid** see a **first grid** with some filled squares.  
 - After a brief **inter-stimulus interval (ISI)**, a **second grid** appears with a different arrangement of filled squares.  
 - **Main Task:** Click the square that was not present in either grid.  
-- **Post-Task Questionnaire:** Strategy use, perceived difficulty and conifdence
--**VVIQ** Vividness Questionnairre - Aphantasia Society Version
+- **Post-Task Questionnaire:** Strategy use, perceived difficulty and confidence
+-**VVIQ** Vividness Questionnaire - Aphantasia Society Version
  - **Demographics Survey:** Age, gender, and visualization experiences.
 
 ## Setup Instructions
@@ -28,7 +28,7 @@ This experiment runs in a web browser. To test locally:
 - Ensure **jsPsych (v6.3.1)** and its dependencies are correctly linked.
 
 ### 3. Running the Experiment
-Simply launch `index.html` in your preferred browser. In Vscode open with live server
+Launch `index.html` in your preferred browser. In Vscode, open with live server
 
 ## File Structure
 ```
