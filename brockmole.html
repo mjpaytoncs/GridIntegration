@@ -24,6 +24,7 @@ Notes: Currently a draft ready for overview and further development.
     <script src="jspsych-6.3.1/plugins/jspsych-survey-likert.js"></script>
     <script src="jspsych-6.3.1/plugins/jspsych-survey-html-form.js"></script>
     <script src="jspsych-6.3.1/plugins/jspsych-survey-multi-choice.js"></script>
+    <script src="jspsych-6.3.1/plugins/jspsych-survey-multi-select.js"></script>
     <style>
         body {
             display: flex;
@@ -543,19 +544,25 @@ Notes: Currently a draft ready for overview and further development.
     });
 
 
-    // Visualization in Daily Life
-    timeline.push({
-        type: 'survey-multi-choice',
-        preamble: '<h2>Visualization in Daily Life</h2>',
-        questions: [
-            {
-                prompt: 'Do you engage in activities that typically require strong visualization skills?',
-                options: ['Art (drawing, painting, design)', 'Music (composition, playing instruments)', 'Sports (mental rehearsal, strategy)',
-                    'Meditation or mindfulness', 'Programming or math', 'None of the above'],
-                required: true
-            }
-        ]
-    });
+    // Visualization in Daily Life 
+        timeline.push({
+            type: 'survey-multi-select',
+            preamble: '<h2>Visualization in Daily Life</h2>',
+            questions: [
+                {
+                    prompt: 'Do you engage in activities that typically require strong visualization skills? (Select all that apply)',
+                    options: [
+                        'Art (drawing, painting, design)',
+                        'Music (composition, playing instruments)',
+                        'Sports (mental rehearsal, strategy)',
+                        'Meditation or mindfulness',
+                        'Programming or math',
+                        'None of the above'
+                    ],
+                    required: true
+                }
+            ]
+        });
 
     // Past Participation in Imagery-Based Studies
     timeline.push({
