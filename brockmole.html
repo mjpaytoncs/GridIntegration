@@ -494,22 +494,28 @@ Notes: Currently a draft ready for overview and further development.
             ]
         });
 
-    // Demographic and Imagery-Related Questions
-    timeline.push({
-        type: 'survey-multi-choice',
-        preamble: '<h2>Demographics</h2>',
-        questions: [
-            { prompt: 'What is your age?', options: ['Under 18', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'], required: false },
-            { prompt: 'What is your gender?', options: ['Male', 'Female', 'Non-binary', 'Prefer not to say', 'Other'], required: true },
-            { prompt: 'What is your highest level of education?', options: ['High School', 'Some College', 'Bachelor\'s Degree', 'Master\'s Degree', 'PhD or higher', 'Other'], required: true },
-            { prompt: 'What is your native language?', options: ['English', 'Spanish', 'Chinese', 'French', 'Other'], required: true },
-            { prompt: 'Which hand do you primarily use?', options: ['Right-handed', 'Left-handed', 'Ambidextrous'], required: true },
-            {
-                prompt: 'Have you ever been diagnosed with a neurological or psychiatric condition?',
-                options: ['No', 'ADHD', 'Autism', 'Epilepsy', 'Anxiety', 'Depression', 'Other'], required: false
-            }
-        ]
-    });
+    // Demographics - Part 1
+        timeline.push({
+            type: 'survey-multi-choice',
+            preamble: '<h2>Demographics - Part 1</h2>',
+            questions: [
+                { prompt: 'What is your age?', options: ['Under 18', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'], required: false },
+                { prompt: 'What is your gender?', options: ['Male', 'Female', 'Non-binary', 'Prefer not to say', 'Other'], required: true },
+                { prompt: 'What is your highest level of education?', options: ['High School', 'Some College', "Bachelor's Degree", "Master's Degree", 'PhD or higher', 'Other'], required: true }
+            ]
+        });
+
+        // Demographics - Part 2
+        timeline.push({
+            type: 'survey-multi-choice',
+            preamble: '<h2>Demographics - Part 2</h2>',
+            questions: [
+                { prompt: 'What is your native language?', options: ['English', 'Spanish', 'Chinese', 'French', 'Other'], required: true },
+                { prompt: 'Which hand do you primarily use?', options: ['Right-handed', 'Left-handed', 'Ambidextrous'], required: true },
+                { prompt: 'Have you ever been diagnosed with a neurological or psychiatric condition?', options: ['No', 'ADHD', 'Autism', 'Epilepsy', 'Anxiety', 'Depression', 'Other'], required: false }
+            ]
+        });
+
 
     // Aphantasia Awareness and Self-Assessment
     timeline.push({
