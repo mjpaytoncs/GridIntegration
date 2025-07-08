@@ -9,10 +9,14 @@ P      A   A    Y      TT    OOOO   N   N
 
 Author: Michael Payton
 Project: Brockmole/Aphantaia
-Date: Feb 2025
-Notes: Currently a draft ready for overview and further development. 
-
+Date: June 2025
+Notes: V2 - Based on JM feedback. 
+Dots instead of fill. Grid stays on in ISI. Feedback screen restored.
+Cell size: 171 px
+Dot size: 143 px
+Each trial starts with participant pressing spacebar—now with the blank grid displayed.
 -->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,11 +24,6 @@ Notes: Currently a draft ready for overview and further development.
     <script src="jspsych-6.3.1/jspsych.js"></script>
     <link rel="stylesheet" href="jspsych-6.3.1/jspsych.css">
     <script src="jspsych-6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
-    <script src="jspsych-6.3.1/plugins/jspsych-survey-text.js"></script>
-    <script src="jspsych-6.3.1/plugins/jspsych-survey-likert.js"></script>
-    <script src="jspsych-6.3.1/plugins/jspsych-survey-html-form.js"></script>
-    <script src="jspsych-6.3.1/plugins/jspsych-survey-multi-choice.js"></script>
-    <script src="jspsych-6.3.1/plugins/jspsych-survey-multi-select.js"></script>
     <style>
         body {
             display: flex;
@@ -38,45 +37,20 @@ Notes: Currently a draft ready for overview and further development.
             text-align: left;
             margin: 0 auto;
         }
-
-        .grid-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 50px;
-            margin-bottom: 20px;
-        }
     </style>
 </head>
 
 <body>
     <script>
-
-        // Experiment Parameters - update: parameters to be imported
+        // Experiment Parameters
         const gridSize = 4;
-        const cellSize = 100;
-        const ISI = 2000;
-        const firstGridDuration = 200;
-        const secondGridDuration = 200;
-        const numTrials = 3;
-
-
-        // Grid properties for First demo
-        const demoFirstGrid = [
-            [1, 1, 0, 0],
-            [1, 1, 0, 0],
-            [1, 1, 0, 0],
-            [1, 1, 0, 0]
-        ];
-
-        const demoSecondGrid = [
-            [0, 0, 1, 1],
-            [0, 0, 0, 1],
-            [0, 0, 1, 1],
-            [0, 0, 1, 1]
-        ];
-
-        const demoMissingCell = [2, 3];
+        const cellSize = 171; // in pixels
+        const dotSize = 143;  // in pixels
+        const ISI = 2000; // Best performance was seen at 2000ms ISI. 
+        const firstGridDuration = 100;
+        const secondGridDuration = 100;
+        const numTrials = 15;
+        const numBlocks = 3;
 
         function generateGrids() {
             let allCells = [];
@@ -85,31 +59,27 @@ Notes: Currently a draft ready for overview and further development.
                     allCells.push([i + 1, j + 1]);
                 }
             }
-
             allCells = jsPsych.randomization.shuffle(allCells);
-
             const firstGridCells = allCells.slice(0, Math.floor((gridSize * gridSize) / 2));
             const remainingCells = allCells.slice(Math.floor((gridSize * gridSize) / 2));
             const missingCell = remainingCells.pop();
-
             const firstGrid = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
-            firstGridCells.forEach(([i, j]) => {
-                firstGrid[i - 1][j - 1] = 1;
-            });
-
+            firstGridCells.forEach(([i, j]) => { firstGrid[i - 1][j - 1] = 1; });
             const secondGrid = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
-            remainingCells.forEach(([i, j]) => {
-                secondGrid[i - 1][j - 1] = 1;
-            });
-
+            remainingCells.forEach(([i, j]) => { secondGrid[i - 1][j - 1] = 1; });
             return { firstGrid, secondGrid, missingCell };
         }
 
         function renderGrid(grid) {
             let html = '<div style="display: grid; grid-template-columns: repeat(' + gridSize + ', ' + cellSize + 'px);">';
-            for (let row of grid) {
-                for (let cell of row) {
-                    html += '<div style="width: ' + cellSize + 'px; height: ' + cellSize + 'px; border: 1px solid black; background-color: ' + (cell ? 'black' : 'white') + ';"></div>';
+            for (let row = 0; row < grid.length; row++) {
+                for (let col = 0; col < grid[row].length; col++) {
+                    const hasDot = grid[row][col] === 1;
+                    html += '<div style="width: ' + cellSize + 'px; height: ' + cellSize + 'px; border: 1px solid black; display: flex; align-items: center; justify-content: center;">';
+                    if (hasDot) {
+                        html += '<div style="width: ' + dotSize + 'px; height: ' + dotSize + 'px; border-radius: 50%; background-color: black;"></div>';
+                    }
+                    html += '</div>';
                 }
             }
             html += '</div>';
@@ -118,487 +88,154 @@ Notes: Currently a draft ready for overview and further development.
 
         const timeline = [];
 
-        // Consent Form - update: will have to be a consent form
-        timeline.push({
-            type: 'html-keyboard-response',
-            stimulus: '<h1>Mock Consent Form: update later</h1>' +
-                '<p>In this experiment, you will complete a task involving grids of squares and a short survey.</p>' +
-                '<p>Your participation is voluntary, and you may withdraw at any time.</p>' +
-                '<p>Press space to agree and continue.</p>',
-            choices: [' ']
-        });
-
-        // Participant ID input - update: will be autogenerated later
-        timeline.push({
-            type: 'survey-text',
-            questions: [{ prompt: 'Please enter your Participant ID:' }],
-            on_finish: function (data) {
-                const responses = data.response || {};
-                jsPsych.data.addProperties({ participantID: responses.Q0 });
-            }
-        });
-
-        // Introduction - update: may require tweaking
-        timeline.push({
-            type: 'html-keyboard-response',
-            stimulus: '<p>In the following experiment, you will be presented with two grids of squares.</p>' +
-                '<p>On each of the grids, <strong>some of the squares are filled in and some of them are not.</strong></p>' +
-                '<p>Your task is to identify which one square was not filled in on either of the two grids.</p>' +
-                '<p>You will indicate the square\'s row and column. Press space to continue.</p>',
-            choices: [' ']
-        });
-
-
-        // Practice round: Intro
-        timeline.push({
-            type: 'html-keyboard-response',
-            stimulus: '<h1>We will start with a practice round where the grids are side by side.</h1>' +
-                '<p>Click on the missing location that was not filled in either grid.</p>' +
-                '<p>Press space to begin.</p>',
-            choices: [' ']
-        });
-
-        const { firstGrid: practiceFirstGrid, secondGrid: practiceSecondGrid, missingCell: practiceMissingCell } = generateGrids();
-
-        // Practice round: Display side-by-side grids with clickable cells
-        timeline.push({
-            type: 'html-keyboard-response',
-            stimulus: function () {
-                return `<div class="grid-container">
-                    <div onclick="registerClick(event)" data-grid="practice">${renderGrid(practiceFirstGrid)}</div>
-                    <div onclick="registerClick(event)" data-grid="practice">${renderGrid(practiceSecondGrid)}</div>
-                </div>`;
-            },
-            choices: jsPsych.NO_KEYS
-        });
-
-        // Practice round: Click event function
-        window.registerClick = function (event) {
-            const cell = event.target;
-            if (cell.tagName === 'DIV' && cell.dataset) {
-                const rowIndex = Math.floor([...cell.parentNode.children].indexOf(cell) / gridSize) + 1;
-                const colIndex = ([...cell.parentNode.children].indexOf(cell) % gridSize) + 1;
-
-                const isCorrect = (rowIndex === practiceMissingCell[0] && colIndex === practiceMissingCell[1]);
-
-                jsPsych.finishTrial({
-                    correct: isCorrect,
-                    clickedCell: `${rowIndex},${colIndex}`,
-                    missingCell: `${practiceMissingCell[0]},${practiceMissingCell[1]}`
-                });
-            }
-        };
-
-        // Practice round: Feedback
-        timeline.push({
-            type: 'html-keyboard-response',
-            stimulus: function () {
-                const lastTrial = jsPsych.data.getLastTrialData().values()[0];
-                return `<h1>${lastTrial.correct ? "Yes, that was correct!" : "Sorry, that was incorrect!"} 
-                The missing location was ${lastTrial.missingCell}, and you clicked ${lastTrial.clickedCell}.</h1>`;
-            },
-            choices: [' ']
-        });
-
-        // Sequential practice rounds
-        timeline.push({
-            type: 'html-keyboard-response',
-            stimulus: '<h1>We will now present the grids <strong>one after the other</strong>.</h1><p>Press space to begin the practice rounds.</p>',
-            choices: [' ']
-        });
-
-        for (let i = 0; i < 3; i++) {
-            const { firstGrid, secondGrid, missingCell } = generateGrids();
-
-            timeline.push({
-                type: 'html-keyboard-response',
-                stimulus: function () {
-                    return renderGrid(firstGrid);
-                },
-                choices: jsPsych.NO_KEYS,
-                trial_duration: firstGridDuration
-            });
-
-            timeline.push({
-                type: 'html-keyboard-response',
-                stimulus: '',
-                choices: jsPsych.NO_KEYS,
-                trial_duration: ISI
-            });
-
-            timeline.push({
-                type: 'html-keyboard-response',
-                stimulus: function () {
-                    return renderGrid(secondGrid);
-                },
-                choices: jsPsych.NO_KEYS,
-                trial_duration: secondGridDuration
-            });
-
-            // Clickable grid for response
-            timeline.push({
-                type: 'html-keyboard-response',
-                stimulus: function () {
-                    let gridHTML = '<div style="display: grid; grid-template-columns: repeat(' + gridSize + ', ' + cellSize + 'px);">';
-                    for (let row = 0; row < gridSize; row++) {
-                        for (let col = 0; col < gridSize; col++) {
-                            gridHTML += `<div class="clickable-cell" 
-                                    data-row="${row + 1}" 
-                                    data-col="${col + 1}" 
-                                    style="width: ${cellSize}px; height: ${cellSize}px; border: 1px solid black; background-color: white; display: inline-block;">
-                                </div>`;
-                        }
-                    }
-                    gridHTML += '</div>';
-                    gridHTML += '<p>Click on the square that was missing.</p>';
-                    return gridHTML;
-                },
-                choices: jsPsych.NO_KEYS,
-                trial_duration: null, // Wait for user input
-                on_load: function () {
-                    document.querySelectorAll('.clickable-cell').forEach(cell => {
-                        cell.addEventListener('click', function () {
-                            let selectedRow = parseInt(this.dataset.row);
-                            let selectedCol = parseInt(this.dataset.col);
-
-                            jsPsych.finishTrial({
-                                selectedRow: selectedRow,
-                                selectedCol: selectedCol
-                            });
-                        });
-                    });
-                }
-            });
-
-            // Feedback
-            timeline.push({
-                type: 'html-keyboard-response',
-                stimulus: function () {
-                    const lastTrial = jsPsych.data.getLastTrialData().values()[0];
-                    const selectedRow = lastTrial.selectedRow;
-                    const selectedCol = lastTrial.selectedCol;
-                    const isCorrect = selectedRow === missingCell[0] && selectedCol === missingCell[1];
-
-                    return `<h1>${isCorrect ? "Yes, that was correct!" : "Sorry, that was incorrect!"} 
-                    The missing location was ${missingCell[0]},${missingCell[1]}, and you clicked ${selectedRow},${selectedCol}.</h1>`;
-                },
-                choices: jsPsych.NO_KEYS,
-                trial_duration: 2000
-            });
-        }
-
-
-        // Main experiment
+        // Intro screen
         timeline.push({
             type: 'html-keyboard-response',
             stimulus: '<h1>The main experiment will now begin. Press space to start.</h1>',
             choices: [' ']
         });
 
-        for (let i = 0; i < numTrials; i++) {
-            const { firstGrid, secondGrid, missingCell } = generateGrids();
+        const trialsPerBlock = Math.ceil(numTrials / numBlocks);
 
-            timeline.push({
-                type: 'html-keyboard-response',
-                stimulus: function () {
-                    return renderGrid(firstGrid);
-                },
-                choices: jsPsych.NO_KEYS,
-                trial_duration: firstGridDuration
-            });
+        for (let block = 0; block < numBlocks; block++) {
+            for (let i = 0; i < trialsPerBlock; i++) {
+                const { firstGrid, secondGrid, missingCell } = generateGrids();
 
-            timeline.push({
-                type: 'html-keyboard-response',
-                stimulus: '',
-                choices: jsPsych.NO_KEYS,
-                trial_duration: ISI
-            });
+                // Augmented trialData with parameters
+                let trialData = {
+                    trueLocation: missingCell.join(','),
+                    gridSize: gridSize,
+                    cellSize: cellSize,
+                    dotSize: dotSize,
+                    ISI: ISI,
+                    firstGridDuration: firstGridDuration,
+                    secondGridDuration: secondGridDuration
+                };
 
-            timeline.push({
-                type: 'html-keyboard-response',
-                stimulus: function () {
-                    return renderGrid(secondGrid);
-                },
-                choices: jsPsych.NO_KEYS,
-                trial_duration: secondGridDuration
-            });
-
-            // Clickable grid for response
-            timeline.push({
-                type: 'html-keyboard-response',
-                stimulus: function () {
-                    let gridHTML = '<div style="display: grid; grid-template-columns: repeat(' + gridSize + ', ' + cellSize + 'px);">';
-                    for (let row = 0; row < gridSize; row++) {
-                        for (let col = 0; col < gridSize; col++) {
-                            gridHTML += `<div class="clickable-cell" 
-                                    data-row="${row + 1}" 
-                                    data-col="${col + 1}" 
-                                    style="width: ${cellSize}px; height: ${cellSize}px; border: 1px solid black; background-color: white; display: inline-block;">
-                                </div>`;
+                // —————— Trial-start screen with grid + spacebar prompt ——————
+                timeline.push({
+                    type: 'html-keyboard-response',
+                    stimulus: function () {
+                        // build blank grid identical to response grid
+                        let gridHTML = '<div style="display: grid; grid-template-columns: repeat(' + gridSize + ', ' + cellSize + 'px);">';
+                        for (let r = 0; r < gridSize; r++) {
+                            for (let c = 0; c < gridSize; c++) {
+                                gridHTML += `<div style="width: ${cellSize}px; height: ${cellSize}px; border: 1px solid black; display: inline-block;"></div>`;
+                            }
                         }
-                    }
-                    gridHTML += '</div>';
-                    gridHTML += '<p>Click on the square that was missing.</p>';
-                    return gridHTML;
-                },
-                choices: jsPsych.NO_KEYS,
-                trial_duration: null, // Wait for user input
-                on_load: function () {
-                    document.querySelectorAll('.clickable-cell').forEach(cell => {
-                        cell.addEventListener('click', function () {
-                            let selectedRow = parseInt(this.dataset.row);
-                            let selectedCol = parseInt(this.dataset.col);
+                        gridHTML += '</div><p>Press space to begin this trial.</p>';
+                        return gridHTML;
+                    },
+                    choices: [' ']
+                });
 
-                            jsPsych.finishTrial({
-                                selectedRow: selectedRow,
-                                selectedCol: selectedCol
+                // first grid
+                timeline.push({
+                    type: 'html-keyboard-response',
+                    stimulus: function () {
+                        trialData.firstStart = performance.now();
+                        return renderGrid(firstGrid);
+                    },
+                    choices: jsPsych.NO_KEYS,
+                    trial_duration: firstGridDuration,
+                    on_finish: function () {
+                        trialData.firstEnd = performance.now();
+                    }
+                });
+
+                // ISI grid
+                timeline.push({
+                    type: 'html-keyboard-response',
+                    stimulus: function () {
+                        trialData.ISIStart = performance.now();
+                        return renderGrid(Array.from({ length: gridSize }, () => Array(gridSize).fill(0)));
+                    },
+                    choices: jsPsych.NO_KEYS,
+                    trial_duration: ISI,
+                    on_finish: function () {
+                        trialData.ISIEnd = performance.now();
+                    }
+                });
+
+                // second grid
+                timeline.push({
+                    type: 'html-keyboard-response',
+                    stimulus: function () {
+                        trialData.secondStart = performance.now();
+                        return renderGrid(secondGrid);
+                    },
+                    choices: jsPsych.NO_KEYS,
+                    trial_duration: secondGridDuration,
+                    on_finish: function () {
+                        trialData.secondEnd = performance.now();
+                    }
+                });
+
+                // response grid
+                timeline.push({
+                    type: 'html-keyboard-response',
+                    stimulus: function () {
+                        let gridHTML = '<div style="display: grid; grid-template-columns: repeat(' + gridSize + ', ' + cellSize + 'px);">';
+                        for (let row = 0; row < gridSize; row++) {
+                            for (let col = 0; col < gridSize; col++) {
+                                gridHTML += `<div class="clickable-cell" data-row="${row + 1}" data-col="${col + 1}" style="width: ${cellSize}px; height: ${cellSize}px; border: 1px solid black; display: inline-block;"></div>`;
+                            }
+                        }
+                        gridHTML += '</div><p>Click on the square that was missing.</p>';
+                        return gridHTML;
+                    },
+                    choices: jsPsych.NO_KEYS,
+                    trial_duration: null,
+                    on_load: function () {
+                        document.querySelectorAll('.clickable-cell').forEach(cell => {
+                            cell.addEventListener('click', function () {
+                                let selectedRow = parseInt(this.dataset.row);
+                                let selectedCol = parseInt(this.dataset.col);
+                                trialData.selectedLocation = selectedRow + ',' + selectedCol;
+                                jsPsych.finishTrial(trialData);
                             });
                         });
-                    });
-                }
-            });
+                    }
+                });
 
-            // Feedback
-            timeline.push({
-                type: 'html-keyboard-response',
-                stimulus: function () {
-                    const lastTrial = jsPsych.data.getLastTrialData().values()[0];
-                    const selectedRow = lastTrial.selectedRow;
-                    const selectedCol = lastTrial.selectedCol;
-                    const isCorrect = selectedRow === missingCell[0] && selectedCol === missingCell[1];
+                // feedback
+                timeline.push({
+                    type: 'html-keyboard-response',
+                    stimulus: function () {
+                        const last = jsPsych.data.getLastTrialData().values()[0];
+                        const isCorrect = last.trueLocation === last.selectedLocation;
+                        return `<h1>${isCorrect ? "Yes, that was correct!" : "Sorry, that was incorrect!"} The missing location was ${last.trueLocation}, and you clicked ${last.selectedLocation}.</h1>`;
+                    },
+                    choices: jsPsych.NO_KEYS,
+                    trial_duration: 2000
+                });
+            }
 
-                    return `<h1>${isCorrect ? "Yes, that was correct!" : "Sorry, that was incorrect!"} 
-                    The missing location was ${missingCell[0]},${missingCell[1]}, and you clicked ${selectedRow},${selectedCol}.</h1>`;
-                },
-                choices: jsPsych.NO_KEYS,
-                trial_duration: 2000
-            });
+            // break between blocks
+            if (block < numBlocks - 1) {
+                timeline.push({
+                    type: 'html-keyboard-response',
+                    stimulus: '<h2>Take a short break! Press space when ready to continue.</h2>',
+                    choices: [' ']
+                });
+            }
         }
 
-        // Post-Grid Task Questionnaire
-            timeline.push({
-                type: 'survey-html-form',
-                preamble: '<h2>Post-Task Questionnaire</h2>',
-                html: `
-        <p>1. Did you use any specific strategy to complete the task? (e.g., visualization, verbalization, guessing, etc.)</p>
-        <textarea name="strategy" rows="3" cols="50"></textarea>
-        
-        <p>2. On a scale from <strong>1 (Very Easy)</strong> to <strong>7 (Very Difficult)</strong>, how difficult did you find the task?</p>
-        <select name="difficulty">
-            <option value="1">1 - Very Easy</option>
-            <option value="2">2 - Easy</option>
-            <option value="3">3 - Somewhat Easy</option>
-            <option value="4">4 - Neutral</option>
-            <option value="5">5 - Somewhat Difficult</option>
-            <option value="6">6 - Difficult</option>
-            <option value="7">7 - Very Difficult</option>
-        </select>
-
-        <p>3. Do you think your ability to visualize affected your performance?</p>
-        <select name="visualization_effect">
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-            <option value="not_sure">Not Sure</option>
-        </select>
-    `,
-                button_label: "Submit",
-                on_finish: function (data) {
-                    jsPsych.data.get().addToLast({
-                        strategy: data.response.strategy,
-                        difficulty: data.response.difficulty,
-                        visualization_effect: data.response.visualization_effect
-                    });
-                }
-            });
-
-
-
-        // VVIQ Instructions
-        timeline.push({
-            type: 'html-keyboard-response',
-            stimulus: '<h1>VVIQ Instructions</h1>' +
-                '<p>In this next section, we will ask you some questions about your experience of mental imagery using various scenarios.</p>' +
-                '<p>For each scenario, try to form a mental picture and rate its vividness on a 5-point scale:</p>' +
-                '<ul>' +
-                '<li>1: No image at all, I only “know” I am thinking of the object.</li>' +
-                '<li>2: Dim and vague image.</li>' +
-                '<li>3: Moderately realistic and vivid.</li>' +
-                '<li>4: Realistic and reasonably vivid.</li>' +
-                '<li>5: Perfectly realistic, as vivid as real seeing.</li>' +
-                '</ul>' +
-                '<p>Press space to begin.</p>',
-            choices: [' ']
-        });
-
-        // VVIQ Q1
-        timeline.push({
-            type: 'survey-likert',
-            preamble: '<h2>Think of some relative or friend whom you frequently see (but who is not with you at present) and consider carefully the picture that comes before your mind’s eye.</h2>',
-            questions: [
-                { prompt: 'The exact contours of face, head, shoulders, and body.', labels: ['1', '2', '3', '4', '5'] },
-                { prompt: 'Characteristic poses of head, attitudes of body, etc.', labels: ['1', '2', '3', '4', '5'] },
-                { prompt: 'The precise carriage, length of step, etc., in walking.', labels: ['1', '2', '3', '4', '5'] },
-                { prompt: 'The different colors worn in some familiar clothes.', labels: ['1', '2', '3', '4', '5'] }
-            ]
-        });
-
-        // VVIQ Q2
-        timeline.push({
-            type: 'survey-likert',
-            preamble: '<h2>Visualise a rising sun. Consider carefully the picture that comes before your mind’s eye.</h2>',
-            questions: [
-                { prompt: 'The sun rising above the horizon into a hazy sky.', labels: ['1', '2', '3', '4', '5'] },
-                { prompt: 'The sky clears and surrounds the sun with blueness.', labels: ['1', '2', '3', '4', '5'] },
-                { prompt: 'Clouds. A storm blows up with flashes of lightning.', labels: ['1', '2', '3', '4', '5'] },
-                { prompt: 'A rainbow appears.', labels: ['1', '2', '3', '4', '5'] }
-            ]
-        });
-
-        // VVIQ Q3
-        timeline.push({
-            type: 'survey-likert',
-            preamble: '<h2>Think of the front of a shop which you often go to. Consider the picture that comes before your mind’s eye.</h2>',
-            questions: [
-                { prompt: 'The overall appearance of the shop from the opposite side of the road.', labels: ['1', '2', '3', '4', '5'] },
-                { prompt: 'A window display including colours, shapes and details of individual items for sale.', labels: ['1', '2', '3', '4', '5'] },
-                { prompt: 'You are near the entrance. The colour, shape and details of the door.', labels: ['1', '2', '3', '4', '5'] },
-                { prompt: 'You enter the shop and go to the counter. The counter Assistant serves you. Money changes hands.', labels: ['1', '2', '3', '4', '5'] }
-            ]
-        });
-
-        // VVIQ Q4
-        timeline.push({
-            type: 'survey-likert',
-            preamble: '<h2>Finally think of a country scene which involves trees, mountains and a lake. Consider the picture that comes before your mind’s eye.</h2>',
-            questions: [
-                { prompt: 'The contours of the landscape.', labels: ['1', '2', '3', '4', '5'] },
-                { prompt: 'The colour and shape of the lake.', labels: ['1', '2', '3', '4', '5'] },
-                { prompt: 'The colour and shape of the trees.', labels: ['1', '2', '3', '4', '5'] },
-                { prompt: 'A strong wind blows on the trees and on the lake causing reflections in the water.', labels: ['1', '2', '3', '4', '5'] }
-            ]
-        });
-
-        // VVIQ Q5
-        timeline.push({
-            type: 'survey-likert',
-            preamble: '<h2>When thinking of objects, people, or memories...</h2>',
-            questions: [
-                {
-                    prompt: 'How vividly do you experience visual imagery in your mind?', labels: [
-                        '1: I don’t experience a visual image, I only “know” I’m thinking of it',
-                        '2: I experience a dim and vague image',
-                        '3: I experience a moderately realistic and vivid image',
-                        '4: I experience a realistic and reasonably vivid image',
-                        '5: I experience a perfectly realistic image, as if I’m seeing it'
-                    ]
-                }
-            ]
-        });
-
-    // Demographics - Part 1
-        timeline.push({
-            type: 'survey-multi-choice',
-            preamble: '<h2>Demographics - Part 1</h2>',
-            questions: [
-                { prompt: 'What is your age?', options: ['Under 18', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'], required: false },
-                { prompt: 'What is your gender?', options: ['Male', 'Female', 'Non-binary', 'Prefer not to say', 'Other'], required: true },
-                { prompt: 'What is your highest level of education?', options: ['High School', 'Some College', "Bachelor's Degree", "Master's Degree", 'PhD or higher', 'Other'], required: true }
-            ]
-        });
-
-        // Demographics - Part 2
-        timeline.push({
-            type: 'survey-multi-choice',
-            preamble: '<h2>Demographics - Part 2</h2>',
-            questions: [
-                { prompt: 'What is your native language?', options: ['English', 'Spanish', 'Chinese', 'French', 'Other'], required: true },
-                { prompt: 'Which hand do you primarily use?', options: ['Right-handed', 'Left-handed', 'Ambidextrous'], required: true },
-                { prompt: 'Have you ever been diagnosed with a neurological or psychiatric condition?', options: ['No', 'ADHD', 'Autism', 'Epilepsy', 'Anxiety', 'Depression', 'Other'], required: false }
-            ]
-        });
-
-
-    // Aphantasia Awareness and Self-Assessment
-    timeline.push({
-        type: 'survey-multi-choice',
-        preamble: '<h2>Imagery & Aphantasia</h2>',
-        questions: [
-            { prompt: 'Have you ever heard of aphantasia before this study?', options: ['Yes', 'No'], required: true },
-            { prompt: 'Do you believe you have aphantasia (the inability to generate mental imagery)?', options: ['Yes', 'No', 'Not sure'], required: true }
-        ]
-    });
-
-    // Visual Imagery Vividness Slider
-    timeline.push({
-        type: 'survey-html-form',
-        preamble: '<h2>Visual Imagery Vividness</h2>',
-        html: '<p>On a scale from <strong>0 (No image at all)</strong> to <strong>100 (Perfectly realistic)</strong>, how vividly can you mentally visualize objects, people, or scenes?</p>' +
-            '<input type="range" id="vividness-slider" name="vividness" min="0" max="100" value="50" step="1" ' +
-            'oninput="document.getElementById(\'vivid-value\').innerText = this.value">' +
-            '<p>Vividness: <span id="vivid-value">50</span></p>',
-        button_label: "Submit",
-        on_finish: function (data) {
-            const vividness = parseInt(data.response.vividness, 10);
-            jsPsych.data.get().addToLast({ vividness: vividness });
-        }
-    });
-
-
-    // Visualization in Daily Life 
-        timeline.push({
-            type: 'survey-multi-select',
-            preamble: '<h2>Visualization in Daily Life</h2>',
-            questions: [
-                {
-                    prompt: 'Do you engage in activities that typically require strong visualization skills? (Select all that apply)',
-                    options: [
-                        'Art (drawing, painting, design)',
-                        'Music (composition, playing instruments)',
-                        'Sports (mental rehearsal, strategy)',
-                        'Meditation or mindfulness',
-                        'Programming or math',
-                        'None of the above'
-                    ],
-                    required: true
-                }
-            ]
-        });
-
-    // Past Participation in Imagery-Based Studies
-    timeline.push({
-        type: 'survey-multi-choice',
-        preamble: '<h2>Past Research Experience</h2>',
-        questions: [
-            { prompt: 'Have you ever taken part in an imagery-based psychological study before?', options: ['Yes', 'No', 'Not sure'], required: true }
-        ]
-    });
-
-    // Thank You Page - update contact 
-    timeline.push({
-        type: 'html-keyboard-response',
-        stimulus: '<h1>Thank You for Participating!</h1>' +
-            '<p>Your responses have been recorded.</p>' +
-            '<p>We appreciate your time and effort in contributing to this study.</p>' +
-            '<p>If you have any questions or would like to learn more about this research, please contact us.</p>' +
-            '<p>Press space to finish.</p>',
-        choices: [' ']
-    });
-
+        // finish & save
         jsPsych.init({
             timeline: timeline,
             on_finish: function () {
-                const csvData = jsPsych.data.get().csv(); // Get data in CSV format
-                const blob = new Blob([csvData], { type: 'text/csv' }); // Create a CSV file
-                const url = URL.createObjectURL(blob); // Generate download URL
+                const csvData = jsPsych.data.get().csv();
+                const blob = new Blob([csvData], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'experiment_data.csv'; // Name of the CSV file
+                link.download = 'experiment_data.csv';
                 document.body.appendChild(link);
-                link.click(); // Trigger the download
+                link.click();
                 document.body.removeChild(link);
             }
         });
-
     </script>
 </body>
 
