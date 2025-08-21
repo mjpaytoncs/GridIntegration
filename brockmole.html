@@ -25,19 +25,58 @@ Each trial starts with participant pressing spacebar—now with the blank grid d
     <link rel="stylesheet" href="jspsych-6.3.1/jspsych.css">
     <script src="jspsych-6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
     <style>
+        /* Remove global flex-centering to avoid reflow jitter */
+        html,
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            height: 100%;
             margin: 0;
         }
-
+    
+        body {
+            margin: 0;
+        }
+    
+        /* Stable layout wrapper for every trial screen */
+        .stage {
+            min-height: 90vh;
+            /* same vertical space on all screens */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* vertically center grid area */
+            align-items: center;
+            /* horizontally center grid area */
+        }
+    
+        /* Where the grid (div of cells) goes */
+        .grid-slot {
+            position: relative;
+        }
+    
+        /* Always-reserved instruction bar under the grid */
+        .instr-slot {
+            height: 48px;
+            /* fixed, keeps grid from moving */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            line-height: 1.2;
+            visibility: hidden;
+            /* reserve space even when empty */
+        }
+    
+        .instr-slot.has-text {
+            visibility: visible;
+        }
+    
         #jspsych-target {
             text-align: left;
             margin: 0 auto;
         }
     </style>
+
+    
 </head>
 
 <body>
@@ -85,7 +124,22 @@ Each trial starts with participant pressing spacebar—now with the blank grid d
             html += '</div>';
             return html;
         }
+        
+    function stage(gridHTML, instructionText = "") {
+        const hasTextClass = instructionText.trim() ? "has-text" : "";
+        return `
+    <div class="stage">
+      <div class="grid-slot">
+        ${gridHTML}
+      </div>
+      <div class="instr-slot ${hasTextClass}">
+        ${instructionText}
+      </div>
+    </div>
+  `;
+    }
 
+        
         const timeline = [];
 
         // Intro screen
@@ -123,18 +177,19 @@ Each trial starts with participant pressing spacebar—now with the blank grid d
                                 gridHTML += `<div style="width: ${cellSize}px; height: ${cellSize}px; border: 1px solid black; display: inline-block;"></div>`;
                             }
                         }
-                        gridHTML += '</div><p>Press space to begin this trial.</p>';
-                        return gridHTML;
+                        gridHTML += '</div>';
+                        return stage(gridHTML, 'Press space to begin this trial.');
                     },
                     choices: [' ']
                 });
+
 
                 // first grid
                 timeline.push({
                     type: 'html-keyboard-response',
                     stimulus: function () {
                         trialData.firstStart = performance.now();
-                        return renderGrid(firstGrid);
+                        return stage(renderGrid(firstGrid), '');
                     },
                     choices: jsPsych.NO_KEYS,
                     trial_duration: firstGridDuration,
@@ -148,7 +203,8 @@ Each trial starts with participant pressing spacebar—now with the blank grid d
                     type: 'html-keyboard-response',
                     stimulus: function () {
                         trialData.ISIStart = performance.now();
-                        return renderGrid(Array.from({ length: gridSize }, () => Array(gridSize).fill(0)));
+                        const blankGrid = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
+                        return stage(renderGrid(blankGrid), '');
                     },
                     choices: jsPsych.NO_KEYS,
                     trial_duration: ISI,
@@ -162,7 +218,7 @@ Each trial starts with participant pressing spacebar—now with the blank grid d
                     type: 'html-keyboard-response',
                     stimulus: function () {
                         trialData.secondStart = performance.now();
-                        return renderGrid(secondGrid);
+                        return stage(renderGrid(secondGrid), '');
                     },
                     choices: jsPsych.NO_KEYS,
                     trial_duration: secondGridDuration,
@@ -181,9 +237,10 @@ Each trial starts with participant pressing spacebar—now with the blank grid d
                                 gridHTML += `<div class="clickable-cell" data-row="${row + 1}" data-col="${col + 1}" style="width: ${cellSize}px; height: ${cellSize}px; border: 1px solid black; display: inline-block;"></div>`;
                             }
                         }
-                        gridHTML += '</div><p>Click on the square that was missing.</p>';
-                        return gridHTML;
+                        gridHTML += '</div>';
+                        return stage(gridHTML, 'Click on the square that was missing.');
                     },
+
                     choices: jsPsych.NO_KEYS,
                     trial_duration: null,
                     on_load: function () {
