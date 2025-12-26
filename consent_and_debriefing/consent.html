@@ -1,0 +1,270 @@
+<!--
+    Landing page with unsigned consent documentation for behavioral
+    experiments in the Subjectivity Lab at Northeastern University.
+    Current IRB approval authorized until July 2024
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script>
+      /////////////////////////////////////////////////////////////////////////
+      // THESE ARE THE ONLY TWO THINGS YOU NEED TO CHANGE
+
+      // Set to true if running through Prolific, false if running through PsyLink.
+      let isThisProlific = true;
+
+      // Make sure your experiment's URL is correctly set here!
+      let experimentURL = "../brockmole.html";
+
+      /////////////////////////////////////////////////////////////////////////
+
+      // This is valid for Behavioral IRB#22-06-13
+
+      let consentURL;
+      let compensationText;
+      let recruitingMethod;
+      if (isThisProlific) {
+        consentURL = "prolific_consent.pdf";
+        compensationText =
+          "As a token of our appreciation for completing the survey, you will be financially compensated for your time. We will pay you via the recruiting platform $12 per hour, approximated to an average completion time for the task on a minute-by-minute basis. For example, if the task takes 20 minutes to complete, then you’ll be paid $4.00 US dollars upon providing the recruiting platform with a completion code. If the task takes 4 minutes, you’ll be paid $0.80 US dollars.";
+        recruitingMethod = " via an online participant-recruiting platform ";
+      } else if (!isThisProlific) {
+        consentURL = "psylink_consent.pdf";
+        compensationText =
+          "Your participation in this study will grant you 1-credit in PsyLink per hour. For any study under 60 minutes, you will get 1-credit hour; for any study between 60 and 120 minutes, you will get 2-credit hours. If you do not complete the task or fail to provide the correct completion code your credit(s) will not be assigned.";
+        recruitingMethod = " via Northeastern’s PsyLink ";
+      }
+
+      // Pass all the GET parameters sent to the consent form on to the experiment.
+      const currentURL = window.location.href;
+      const splitURL = currentURL.split("?");
+      if (splitURL.length === 2) {
+        experimentURL = experimentURL + "?" + splitURL[1];
+      }
+      const goToExperiment = (experimentURL) =>
+        Object.assign(document.createElement("a"), {
+          href: experimentURL,
+        }).click();
+
+      let consentFileName = "unsigned_consent_form.pdf";
+      const downloadConsentForm = (consentURL, consentFileName) =>
+        Object.assign(document.createElement("a"), {
+          href: consentURL,
+          download: consentFileName,
+          target: "_blank",
+        }).click();
+    </script>
+
+    <meta charset="utf-8" />
+    <title>Informed Consent</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+
+  <body>
+    <div id="mainContainer">
+      <div id="landingPage">
+        <h1>Welcome!</h1>
+        <p style="text-align: justify">
+          Please read the following informed consent form detailing relevant
+          information about your voluntary participation in the the experiment.
+          If you agree, click on the "Accept" button at the bottom to begin the
+          experiment.
+        </p>
+        <br />
+        <div id="informedConsentText">
+          <p>Northeastern University, Department of Psychology</p>
+          <p>Name of Investigator(s): Jorge Morales</p>
+          <p>Title of Project: Perceptual Awareness and Decision-Making</p>
+          <br />
+          <p><b>Request to Participate in Research</b></p>
+          <p>
+            We would like to invite you to participate in a web-based online
+            study. The survey is part of a research study whose purpose is to
+            investigate how what you see, hear or imagine (e.g., color, shape,
+            duration, motion, sounds, etc.) and what you experience and think
+            (e.g., appearances, conscious awareness, judgment, confidence,
+            decision-making, planning etc.) interact.
+          </p>
+          <br />
+          <p><b>Key Information </b></p>
+          <ul>
+            <li>
+              Your consent is being sought for participation in a research
+              project and your participation is voluntary.
+            </li>
+            <li>
+              The purpose of the research is to understand people’s sensory
+              perceptual experiences (things they see, things they hear, things
+              they imagine, etc.), what they think about these experiences, and
+              to measure decisions they make based on those experiences.
+            </li>
+            <li>
+              The anticipated amount of time that your participation will take
+              will be between 1 and 120 minutes.
+            </li>
+            <li>The procedures that you will be asked to complete will be:</li>
+            <ul>
+              <li>Sit in front of your computer</li>
+              <li>Look or listen to stimuli presented on the screen</li>
+              <li>
+                Use your imagination to picture certain images, sounds,
+                sensations
+              </li>
+              <li>
+                Press a key or use the mouse to tell us what you
+                saw/heard/imagined
+              </li>
+              <li>
+                Press a key or use the mouse to tell us what you think about
+                what you saw/heard/imagined
+              </li>
+              <li>
+                Press a key or use the mouse to tell us how you think you are
+                doing in the task
+              </li>
+              <li>
+                Answer some questions about your experience doing the task
+              </li>
+            </ul>
+            <li>In some versions of the task, we may:</li>
+            <ul>
+              <li>
+                Ask you to turn on your camera (computer’s webcam) so that we
+                can non-invasively measure your eyes and where they are pointing
+                at on the screen. Your webcam will be activated to track your
+                gaze (eye movements), pupil size, or broad shifts in your head
+                direction. The eye tracker is calibrated at the beginning of the
+                experiment (and every now and then throughout the experiment) by
+                asking you to look at particular regions on the screen.
+                Sometimes you will be asked to keep your eyes fixed on a
+                particular object on the screen for very brief periods of time
+                on each trial (e.g., a cross at the center of the screen). While
+                other times you will be allowed to move your eyes freely. You
+                will have to allow your browser to turn on your camera. You’ll
+                then be able to see yourself in a small box in the corner of the
+                screen. The eye tracker works in real time and all the data is
+                processed on your computer while the algorithm assesses where
+                you’re looking at. This means that at no time we will record a
+                video of you and no video will be live streamed anywhere at any
+                point.
+              </li>
+            </ul>
+            <li>
+              The possible risks or discomforts of the study are minimal. You
+              may experience fatigue from doing a repetitive task (boredom).
+            </li>
+            <li>There are no potential benefits for you</li>
+          </ul>
+          <p>
+            We are asking you to participate in this study
+            <span id="recruitingMethod"></span> to help us better understand the
+            human mind. You must be between 18 and 65 years old to take this
+            survey and able to turn on your webcam.
+          </p>
+          <p>
+            The decision to participate in this research project is voluntary.
+            You do not have to participate, and you can refuse to answer any
+            question. Even if you begin the web-based online survey, you can
+            stop at any time.
+          </p>
+          <p>
+            The possible risks or discomforts of the study are minimal. You may
+            experience is fatigue from doing a repetitive task (boredom). There
+            will be some breaks built into the study.
+          </p>
+          <p>
+            There are no direct benefits to you from participating in this
+            study. However, your responses may help us to further understand how
+            perception, cognition and consciousness function.
+          </p>
+          <p><span id="compensationText"></span></p>
+          <p>
+            Your part in this study is anonymous to the researcher(s), unless
+            you choose to include information in the open-ended questions that
+            makes you identifiable. Your data will be handled in a confidential
+            manner. In addition, because of the nature of web-based surveys, it
+            is possible that respondents could be identified by the IP address
+            or other electronic record associated with the response. Neither the
+            researcher nor anyone involved with this survey will be recording
+            those data. The only individually-identifying data we receive from
+            your crowdsourcing platform or panel are your unique identifier and
+            your country. Your data are also stored on your platform or panel’s
+            servers, and the data there are subject to their respective Privacy
+            Notice and Participation Agreements.
+          </p>
+          <p>
+            No reports or publications will use information that can identify
+            you in any way or any individual as being of this project. The only
+            indicators we will record are your age, gender, handedness, and
+            whether you use corrective lenses or not. De-identified data (i.e.,
+            your responses but not who provided them) will be shared with
+            scientific collaborators and hosted on public data sharing websites
+            (e.g., the Open Science Framework, https://osf.io).
+          </p>
+          <br />
+          <p><b>Future Use of Data</b></p>
+          <p>
+            Your de-identified information could be used for future research
+            without additional informed consent.
+          </p>
+          <p>
+            If you have any questions regarding electronic privacy, please
+            contact Northeastern University’s Office of Information Security via
+            phone at 617-373-7901, or via email at privacy@northeastern.edu.
+          </p>
+          <p>
+            If you have any questions about this study, please contact Jorge
+            Morales, Principal Investigator, 360 Huntington Ave., Northeastern
+            University, 125 Nightingale, Boston, MA 02115, Tel. 617-373-5511,
+            Email: j.morales@northeastern.edu.
+          </p>
+          <p>
+            If you have any questions regarding your rights as a research
+            participant, please contact Nan C. Regina, Director, Human Subject
+            Research Protection, Mail Stop: 560-177, 360 Huntington Avenue,
+            Northeastern University, Boston, MA 02115. Tel: 617.373.4588, Email:
+            n.regina@northeastern.edu. You may call anonymously if you wish.
+          </p>
+          <p>
+            This study has been reviewed and approved by the Northeastern
+            University Institutional Review Board (#22-06-13).
+          </p>
+          <br />
+          <p>
+            By clicking on the “accept” button below you are indicating that you
+            consent to participate in this study. Please print out a copy of
+            this consent screen or download a copy of the consent form for your
+            records.
+          </p>
+          <p>Thank you for your time.</p>
+          <p>Jorge Morales</p>
+          <p>Principal Investigator</p>
+
+          <br />
+
+          <button
+            class="nextButton"
+            id="buttonGiveConsent"
+            onclick="goToExperiment(experimentURL)"
+          >
+            Accept
+          </button>
+          <button
+            class="nextButton"
+            id="buttonDownloadConsent"
+            onclick="downloadConsentForm(consentURL, consentFileName)"
+          >
+            Download Consent Form
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    $("#compensationText").text(compensationText);
+    $("#recruitingMethod").text(recruitingMethod);
+  </script>
+</html>

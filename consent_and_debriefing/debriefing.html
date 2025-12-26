@@ -1,0 +1,116 @@
+<!--
+    Debriefing page for behavioral experiments in the Subjectivity Lab at
+    Northeastern University. Current IRB approval authorized until July 2024
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script>
+      ///////////////////////////////////////////////////////////////////////
+      // THESE ARE THE ONLY TWO THINGS YOU NEED TO CHANGE
+
+      // Set to true if running through Prolific, false if running through PsyLink.
+      const prolific = true;
+
+      // Make sure your experiment's return URL is set correctly here.
+      // For Prolific, this is a link that starts with https://app.prolific.com/submissions/complete.
+      // For PsyLink, this is a link that starts with https://nu-psylink.sona-systems.com/webstudy_credit.aspx
+      // and ends with an "XXXX" that you need to remove so that the link ends with "&survey_code=".
+      let return_URL = "https://app.prolific.com/submissions/complete?cc=C7Y3B8JT";
+
+      ///////////////////////////////////////////////////////////////////////
+
+      // This is valid for Behavioral IRB#22-06-13
+
+      let button_text;
+      if (prolific) {
+        button_text =
+          "Click here to finish the experiment and return to Prolific to be paid.";
+      } else {
+        // Pass the participant ID back to PsyLink
+        const current_URL = new URL(window.location.href);
+        const participant_id = current_URL.searchParams.get("PROLIFIC_PID");
+        return_URL = return_URL + participant_id;
+        button_text =
+          "Click here to finish the experiment and return to PsyLink to receive credit.";
+      }
+
+      const finish_experiment = (return_URL) =>
+        Object.assign(document.createElement("a"), {
+          href: return_URL,
+        }).click();
+    </script>
+
+    <meta charset="utf-8" />
+    <title>Debriefing</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+
+  <body>
+    <div id="mainContainer">
+      <h2>Information about the study you just completed</h2>
+      <h4>Thank you for your help today!</h4>
+      <p>
+        Very broadly, the purpose of this research is to investigate how what
+        people see, hear, or imagine (e.g., color, shape, duration, motion,
+        sounds, etc.) and what people experience and think (e.g., appearances,
+        conscious awareness, judgment, confidence, decision- making, planning
+        etc.) interact. Our experiences have both objective and subjective
+        aspects, and we are trying to understand how they relate to each other.
+        When looking at or imagining different objects, our minds interpret both
+        its objective properties (e.g., color, shape, motion, etc.) and its
+        subjective properties (e.g., how it looks to you from here at this
+        particular moment, etc.). Importantly, our minds often perform cognitive
+        operations on these perceptual experiences when we evaluate them: Was I
+        aware of the stimulus? How well am I remembering what I saw? How
+        confident am I that I judged its perceptual properties correctly? What
+        strategies could I use for more accurately classifying these stimuli?
+        Are my general strategies in engaging with this stimulus effective or
+        novel enough? By relating these subjective and objective properties of
+        our experiences, we are trying to understand better how our minds make
+        sense of the environment, and how our experiences relate to some of
+        mental capacities such as reasoning, deciding, imagining, remembering,
+        and so on.
+      </p>
+      <p>
+        Sometimes we use eye-tracking technology to make sure that we know what
+        part of the screen participants are looking at as different aspects of
+        what was seen may have attracted a participants’ gaze in different
+        manner at different times of the study. Moreover, when we use
+        eye-tracking we also look at the size of participants’ pupils since,
+        sometimes, the size of the pupil is an indirect measure of how
+        participants experienced our task (for example, when noticing something
+        on the screen, the pupil may grow a little bit in size).
+      </p>
+      <p>
+        If you have more questions about this study, please feel free to write
+        Dr. Jorge Morales (j.morales@northeastern.edu) (Principal Investigator
+        at the Subjectivity Lab (<a
+          href="http://www.subjectivitylab.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          >www.subjectivitylab.org</a
+        >) at Northeastern University).
+      </p>
+      <button
+        class="nextButton"
+        id="finish_button"
+        onclick="finish_experiment(return_URL)"
+      ></button>
+      <a
+        href="debriefing.pdf"
+        download="debriefing.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        style="text-align: center; display: block"
+        >Download a copy of this information</a
+      >
+    </div>
+  </body>
+  <script>
+    $("#finish_button").html(button_text);
+  </script>
+</html>

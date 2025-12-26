@@ -9,24 +9,28 @@ P      A   A    Y      TT    OOOO   N   N
 
 Author: Michael Payton
 Project: Brockmole/Aphantaia
-Date: AUgust 2025
-Notes: V3 - Modularized based on JM and XH example code.
+Date: Nov 2025
+Notes: V4 - Added structure based on JM starter code. 
+Dots instead of fill. Grid stays on in ISI. Feedback screen restored.
 Cell size: 171 px
 Dot size: 143 px
+Each trial starts with participant pressing spacebar—now with the blank grid displayed.
 -->
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jsPsych Missing Object Task</title>
+
+    <!-- jsPsych core -->
     <script src="jspsych-6.3.1/jspsych.js"></script>
     <link rel="stylesheet" href="jspsych-6.3.1/jspsych.css">
+
+    <!-- jsPsych plugins -->
+    <script src="jspsych-6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
     <script src="jspsych-6.3.1/plugins/jspsych-instructions.js"></script>
-    <script src="jspsych-6.3.1/plugins/jspsych-fullscreen.js"></script>
-    <script src="jspsych-6.3.1/plugins/jspsych-browser-check.js"></script>
-    <script src="jspsych-6.3.1/plugins/jspsych-preload.js"></script>
     <script src="jspsych-6.3.1/plugins/jspsych-survey-multi-choice.js"></script>
-    <script src="jspsych-6.3.1/plugins/jspsych-survey-text.js"></script>
+    <script src="jspsych-6.3.1/plugins/jspsych-html-button-response.js"></script>
 
     <style>
         /* Remove global flex-centering to avoid reflow jitter */
@@ -35,11 +39,11 @@ Dot size: 143 px
             height: 100%;
             margin: 0;
         }
-    
+
         body {
             margin: 0;
         }
-    
+
         /* Stable layout wrapper for every trial screen */
         .stage {
             min-height: 90vh;
@@ -51,12 +55,12 @@ Dot size: 143 px
             align-items: center;
             /* horizontally center grid area */
         }
-    
+
         /* Where the grid (div of cells) goes */
         .grid-slot {
             position: relative;
         }
-    
+
         /* Always-reserved instruction bar under the grid */
         .instr-slot {
             height: 48px;
@@ -69,27 +73,48 @@ Dot size: 143 px
             visibility: hidden;
             /* reserve space even when empty */
         }
-    
+
         .instr-slot.has-text {
             visibility: visible;
         }
-    
+
         #jspsych-target {
             text-align: left;
             margin: 0 auto;
         }
+        
+       /* Center text-only jsPsych screens (intro, breaks, feedback) */
+.jspsych-content-wrapper:not(:has(.stage)) {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100vh !important;
+}
+
+/* Center text horizontally always */
+#jspsych-content {
+    text-align: center !important;
+    margin: 0 auto !important;
+}
+
+
     </style>
 
-    
-</head>
-
-<body>
-    <!-- Loading modules-->
+    <!-- Experiment modules -->
     <script src="constants.js"></script>
     <script src="modules/consent.js"></script>
     <script src="modules/instructions.js"></script>
     <script src="modules/vviq.js"></script>
     <script src="modules/task_brockmole.js"></script>
+
+</head>
+
+<body>
+
+    <div id="jspsych-target"></div>
+
+    
     <script src="main.js"></script>
 </body>
 
