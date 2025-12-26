@@ -18,11 +18,26 @@
         const gridSize = config.gridSize || BROCKMOLE_DEFAULTS.gridSize;
         const cellSize = config.cellSize || BROCKMOLE_DEFAULTS.cellSize;
         const dotSize = config.dotSize || BROCKMOLE_DEFAULTS.dotSize;
-        const ISI = config.ISI || BROCKMOLE_DEFAULTS.ISI;
         const firstGridDuration = config.firstGridDuration || BROCKMOLE_DEFAULTS.firstGridDuration;
         const secondGridDuration = config.secondGridDuration || BROCKMOLE_DEFAULTS.secondGridDuration;
         const numTrials = config.numTrials || BROCKMOLE_DEFAULTS.numTrials;
         const numBlocks = config.numBlocks || BROCKMOLE_DEFAULTS.numBlocks;
+
+        // ISI Defaults and Overrides
+        const baseISI = (typeof config.ISI === 'number') ? config.ISI : BROCKMOLE_DEFAULTS.ISI;
+
+        // --- ISI-by-block override settings ---
+        const isiOverride = (config && config.ISI_OVERRIDE) ? config.ISI_OVERRIDE : BROCKMOLE_DEFAULTS.ISI_OVERRIDE;
+        const isiOverrideEnabled = !!(isiOverride && isiOverride.enabled === true);
+
+        const isiValues = (isiOverride && Array.isArray(isiOverride.values) && isiOverride.values.length > 0)
+            ? isiOverride.values
+            : [];
+
+        const isiOrder = (isiOverride && typeof isiOverride.order === 'string')
+            ? isiOverride.order
+            : "in_order";
+
 
         // Mask Controls (Optional)
         const firstGridMask = (typeof config.firstGridMask === 'boolean')
@@ -151,6 +166,30 @@
 
         const trialsPerBlock = Math.ceil(numTrials / numBlocks);
 
+        // --- Decide ISI used for each block ---
+        // blockISIMap[blockIndex] = ISI in ms
+        let blockISIMap = [];
+
+        if (!isiOverrideEnabled || isiValues.length === 0) {
+            // No override: every block uses the same base ISI
+            blockISIMap = Array.from({ length: numBlocks }, () => baseISI);
+        } else if (isiOrder === "random") {
+            // Random: shuffle values, then assign to blocks (cycle if needed)
+            let shuffled = jsPsych.randomization.shuffle(isiValues.slice());
+            for (let b = 0; b < numBlocks; b++) {
+                if (b % isiValues.length === 0) {
+                    shuffled = jsPsych.randomization.shuffle(isiValues.slice());
+                }
+                blockISIMap.push(shuffled[b % isiValues.length]);
+            }
+        } else {
+            // In order: assign values in order (cycle if needed)
+            for (let b = 0; b < numBlocks; b++) {
+                blockISIMap.push(isiValues[b % isiValues.length]);
+            }
+        }
+
+
         for (let block = 0; block < numBlocks; block++) {
             currentBlock = block;
 
@@ -170,7 +209,10 @@
                     gridSize: gridSize,
                     cellSize: cellSize,
                     dotSize: dotSize,
-                    ISI: ISI,
+                    ISI: blockISIMap[block],              // actual ISI used for this trial
+                    ISI_override_enabled: isiOverrideEnabled,
+                    ISI_override_order: isiOrder,
+                    ISI_override_values: isiValues.slice(), // for reproducibility
                     firstGridDuration: firstGridDuration,
                     secondGridDuration: secondGridDuration,
 
@@ -269,7 +311,7 @@
                         return stage(renderGrid(blankGrid), '');
                     },
                     choices: jsPsych.NO_KEYS,
-                    trial_duration: ISI,
+                    trial_duration: blockISIMap[block],
                     on_finish: function () {
                         trialData.ISIEnd = performance.now();
                     }

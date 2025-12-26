@@ -20,7 +20,7 @@ const INCLUDE = {
 const DEBUG_SKIP = {
     instructions: true,
     vviq: true,
-    brockmole: true
+    brockmole: false
 };
 
 // Default parameters for the Grid Integration Brockmole task
@@ -28,9 +28,20 @@ const BROCKMOLE_DEFAULTS = {
     gridSize: 4, // number of squares in the grid
     cellSize: 171, // original 171
     dotSize: 143, // original 143
-    ISI: 500, // in MS
     firstGridDuration: 100,
     secondGridDuration: 100,
+    ISI: 500, // default ISI in ms (used when override is off)
+
+    // --- ISI-by-block override ---
+    ISI_OVERRIDE: {
+        enabled: true,          // toggle override on/off
+        values: [200, 800], // ISIs to use (ms)
+        order: "in_order",       // "in_order" or "random"
+        // if numBlocks > values.length:
+        // - "in_order" cycles through values
+        // - "random" reshuffles and cycles
+    },
+
 
     // Optional Mask Controls 
     firstGridMask: false,
@@ -41,8 +52,8 @@ const BROCKMOLE_DEFAULTS = {
     maskDuration: 50, // ms
 
     // Main Experiment Trials: Original Brockmole was 384 trials in 8 blocks (48 per block)
-    numTrials: 25, // total number of trials across all blocks
-    numBlocks: 5, // total umber of blocks 
+    numTrials: 8, // total number of trials across all blocks
+    numBlocks: 2, // total umber of blocks 
 
     // Main task: NO feedback in original
     giveTrialFeedback: false,
