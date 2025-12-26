@@ -7,7 +7,7 @@
 //P      A   A    Y      TT    OOOO   N   N
 
 // Notes:
-// Wrapper around Brockmole task
+// Wrapper around Brockmole task, but there is a ton of functionality in here... check comments carefully
 
 (function (global) {
     if (!global.Modules) global.Modules = {};
@@ -54,8 +54,6 @@
             ? config.giveBlockFeedback
             : isPractice;
 
-
-
         // Trialcounter for Feedback screen
         let trialIndex = 0;
         let correctSoFar = 0;
@@ -66,7 +64,6 @@
 
 
         // === Generate Grid ===
-
         function generateGrids() {
             let allCells = [];
             for (let i = 0; i < gridSize; i++) {
@@ -87,7 +84,7 @@
 
         // Rendering
 
-        // Convert grid to a  list of dot locations for saving and later analysis
+        // Convert grid to a list of dot locations for saving and later analysis
         function gridToDotLocations(grid) {
             const locs = [];
             for (let r = 0; r < grid.length; r++) {
@@ -167,8 +164,6 @@
                 const firstGridDots = gridToDotLocations(firstGrid);
                 const secondGridDots = gridToDotLocations(secondGrid);
 
-
-
                 // Augmented trialData with parameters
                 let trialData = {
                     trueLocation: missingCell.join(','),
@@ -192,7 +187,6 @@
                     overallTrialNumber: (block * trialsPerBlock) + (i + 1),
                     totalBlocks: numBlocks,
                     totalTrials: numTrials,
-
 
                     // stimulus configuration (critical)
                     firstGridDots: firstGridDots,
@@ -265,8 +259,6 @@
                         }
                     });
                 }
-
-
 
                 // ISI grid
                 timeline.push({
